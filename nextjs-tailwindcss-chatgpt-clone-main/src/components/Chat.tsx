@@ -60,16 +60,30 @@ const Chat = (props: any) => {
     setShowEmptyChat(false);
 
     try {
-      const response = await fetch(`/api/openai`, {
+      // const response = await fetch(`/api/openai`, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     messages: [...conversation, { content: message, role: "user" }],
+      //     model: selectedModel,
+      //   }),
+      // });
+      // FLASK IMPLEMENTATION
+      const response = await fetch('http://127.0.0.1:5000/openai',{
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type' : 'application/json'
         },
         body: JSON.stringify({
-          messages: [...conversation, { content: message, role: "user" }],
-          model: selectedModel,
-        }),
-      });
+          // model: model.id,
+          temperature: 0.5,
+          messages: [...conversation, { content: message, role: "user" }]
+        })
+      })
+
+      // const responseMessage = response.choices[0].message?.content.trim();
 
       if (response.ok) {
         const data = await response.json();
@@ -78,7 +92,7 @@ const Chat = (props: any) => {
         setConversation([
           ...conversation,
           { content: message, role: "user" },
-          { content: data.message, role: "system" },
+          { content: data.choices[0].message.content, role: "system" },
         ]);
       } else {
         console.error(response);
